@@ -87,10 +87,10 @@ GET /api/estadisticas
 
 ## Integrantes del grupo
 
-- [Agustin Elisey Larco]
-- [Juan Babarro]
-- [Nahuel Nauza]
-- [Nicolas Villanueva]
+- Agustin Elisey Larco
+- Juan Babarro
+- Nahuel Nauza
+- Nicolas Villanueva
 
 ## Conclusión
 
