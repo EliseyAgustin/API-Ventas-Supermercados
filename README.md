@@ -1,6 +1,6 @@
 # API de Ventas de Supermercados
 
-Este es un trabajo práctico para la materia de NodeJS. Consiste en una aplicación que permite gestionar y consultar datos de ventas de supermercados.
+Este es un trabajo practico para la materia de Programacion Web 2. Consiste en una aplicación que permite gestionar y consultar datos de ventas de supermercados.
 
 ## Descripción
 
