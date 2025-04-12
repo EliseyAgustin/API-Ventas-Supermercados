@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API de Ventas de Supermercados</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>API de Ventas de Supermercados</h1>
+        <p>Sistema de gestión de datos de ventas de supermercados</p>
+    </header>
+
+    <main>
+        <section class="endpoints">
+            <h2>Endpoints Disponibles</h2>
+            
+            <div class="endpoint-card">
+                <h3>Endpoints Básicos</h3>
+                <ul>
+                    <li><strong>GET /api/ventas</strong> - Obtener todos los registros</li>
+                    <li><strong>GET /api/ventas/:fecha</strong> - Obtener registro por fecha</li>
+                    <li><strong>POST /api/ventas</strong> - Crear nuevo registro</li>
+                    <li><strong>PUT /api/ventas/:fecha</strong> - Actualizar registro existente</li>
+                    <li><strong>DELETE /api/ventas/:fecha</strong> - Eliminar registro</li>
+                </ul>
+            </div>
+
+            <div class="endpoint-card">
+                <h3>Filtros y Funcionalidades Adicionales</h3>
+                <ul>
+                    <li><strong>GET /api/ventas/filtro/fecha?desde=YYYY-MM-DD&hasta=YYYY-MM-DD</strong> - Filtrar por rango de fechas</li>
+                    <li><strong>GET /api/ventas/filtro/canal?canal=online|salon</strong> - Filtrar por canal de venta</li>
+                    <li><strong>GET /api/ventas/filtro/medio-pago?medio=efectivo|tarjetas_debito|tarjetas_credito|otros_medios</strong> - Filtrar por medio de pago</li>
+                    <li><strong>GET /api/ventas/filtro/categoria?categoria=bebidas|almacen|...</strong> - Filtrar por categoría de producto</li>
+                    <li><strong>GET /api/estadisticas</strong> - Obtener estadísticas generales</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="test-api">
+            <h2>Probar la API</h2>
+            
+            <div class="form-container">
+                <h3>Consultar Datos</h3>
+                <form id="queryForm">
+                    <div class="form-group">
+                        <label for="endpoint">Endpoint:</label>
+                        <select id="endpoint" required>
+                            <option value="/api/ventas">Todos los registros</option>
+                            <option value="/api/estadisticas">Estadísticas generales</option>
+                            <option value="/api/ventas/filtro/fecha">Filtrar por fecha</option>
+                            <option value="/api/ventas/filtro/canal">Filtrar por canal</option>
+                            <option value="/api/ventas/filtro/medio-pago">Filtrar por medio de pago</option>
+                            <option value="/api/ventas/filtro/categoria">Filtrar por categoría</option>
+                        </select>
+                    </div>
+                    
+                    <div id="dateParams" class="form-group hidden">
+                        <label for="desde">Desde:</label>
+                        <input type="date" id="desde">
+                        <label for="hasta">Hasta:</label>
+                        <input type="date" id="hasta">
+                    </div>
+                    
+                    <div id="canalParams" class="form-group hidden">
+                        <label for="canal">Canal:</label>
+                        <select id="canal">
+                            <option value="online">Online</option>
+                            <option value="salon">Salón de ventas</option>
+                        </select>
+                    </div>
+                    
+                    <div id="medioParams" class="form-group hidden">
+                        <label for="medio">Medio de pago:</label>
+                        <select id="medio">
+                            <option value="efectivo">Efectivo</option>
+                            <option value="tarjetas_debito">Tarjeta de débito</option>
+                            <option value="tarjetas_credito">Tarjeta de crédito</option>
+                            <option value="otros_medios">Otros medios</option>
+                        </select>
+                    </div>
+                    
+                    <div id="categoriaParams" class="form-group hidden">
+                        <label for="categoria">Categoría:</label>
+                        <select id="categoria">
+                            <option value="bebidas">Bebidas</option>
+                            <option value="almacen">Almacén</option>
+                            <option value="panaderia">Panadería</option>
+                            <option value="lacteos">Lácteos</option>
+                            <option value="carnes">Carnes</option>
+                            <option value="verduleria_fruteria">Verdulería y frutería</option>
+                            <option value="alimentos_preparados_rotiseria">Alimentos preparados</option>
+                            <option value="articulos_limpieza_perfumeria">Limpieza y perfumería</option>
+                            <option value="indumentaria_calzado_textiles_hogar">Indumentaria y textiles</option>
+                            <option value="electronicos_articulos_hogar">Electrónicos</option>
+                            <option value="otros">Otros</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit">Consultar</button>
+                </form>
+            </div>
+            
+            <div class="result-container">
+                <h3>Resultado</h3>
+                <pre id="result">Los resultados se mostrarán aquí...</pre>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>API de Ventas de Supermercados - Aplicación NodeJS con Express</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
