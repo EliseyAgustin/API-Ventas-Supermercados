@@ -35,20 +35,6 @@ Los datos utilizados provienen de un archivo CSV que contiene información sobre
    ```
 6. Abrir el navegador en http://localhost:7050
 
-## Estructura del proyecto
-
-```
-api-ventas-supermercados/
-├── app.js                # Archivo principal de la aplicación
-├── package.json          # Dependencias y scripts
-├── datos/                # Carpeta para el archivo CSV
-│   └── ventas-totales-supermercados-2.csv
-└── public/               # Archivos estáticos
-    ├── index.html        # Página web
-    ├── estilos.css       # Estilos CSS
-    └── script.js         # JavaScript para la página
-```
-
 ## Endpoints de la API
 
 ### Operaciones básicas
@@ -101,9 +87,10 @@ GET /api/estadisticas
 
 ## Integrantes del grupo
 
-- [Nombre del estudiante 1]
-- [Nombre del estudiante 2]
-- [Nombre del estudiante 3]
+- [Agustin Elisey Larco]
+- [Juan Babarro]
+- [Nahuel Nauza]
+- [Nicolas Villanueva]
 
 ## Conclusión
 
