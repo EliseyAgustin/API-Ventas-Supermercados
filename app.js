@@ -1,323 +1,176 @@
-import express from 'express';
-import fs from 'fs';
-import { parse } from 'csv-parse';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import express from 'express'; // Importa el framework Express para crear la API
+import fs from 'fs'; // Importa el módulo de sistema de archivos de Node.js
+import csv from 'csv-parser'; // Importa el módulo para leer archivos CSV
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const app = express(); // Crea una instancia de una aplicación Express
+const PORT = 7050; // Define el puerto en el que correrá el servidor
+app.use(express.json()); // Middleware para poder leer datos JSON en requests
 
-const app = express();
-const PORT = 7050;
+let datos = []; // Array donde se almacenarán los datos leídos del CSV
+let columnas = []; // Array para guardar los nombres de las columnas del CSV
 
-// Middleware para parsear JSON
-app.use(express.json());
-// Middleware para servir archivos estáticos
-app.use(express.static(path.join(__dirname, 'public')));
+// Leer el archivo CSV al iniciar el servidor
+fs.createReadStream('./data/VentasProductosSupermercados.csv') // Crea un stream de lectura desde el archivo CSV
+  .pipe(csv()) // Pasa el stream por el parser CSV
+  .on('data', (row) => { // Por cada fila leída del CSV...
+    const fila = {};
 
-// Datos cargados desde el CSV
-let ventasData = [];
+    for (let clave in row) {
+      const valor = row[clave].trim(); // Quita espacios al inicio y final
 
-// Función para cargar los datos del CSV
-const cargarDatos = () => {
-  return new Promise((resolve, reject) => {
-    const resultados = [];
-    fs.createReadStream('./data/ventas-totales-supermercados-2.csv')
-      .pipe(parse({ columns: true, delimiter: ',' }))
-      .on('data', (data) => {
-        // Convertir strings a números donde corresponda
-        Object.keys(data).forEach(key => {
-          if (key !== 'indice_tiempo') {
-            data[key] = parseFloat(data[key]);
-          }
-        });
-        resultados.push(data);
-      })
-      .on('end', () => {
-        resolve(resultados);
-      })
-      .on('error', (error) => {
-        reject(error);
-      });
-  });
-};
-
-// Ruta principal - Página HTML
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-// GET - Obtener todos los registros
-app.get('/api/ventas', (req, res) => {
-  res.status(200).json({
-    status: 'success',
-    count: ventasData.length,
-    data: ventasData
-  });
-});
-
-// GET - Obtener un registro por fecha
-app.get('/api/ventas/:fecha', (req, res) => {
-  const fecha = req.params.fecha;
-  const venta = ventasData.find(v => v.indice_tiempo === fecha);
-  
-  if (!venta) {
-    return res.status(404).json({
-      status: 'error',
-      message: `No se encontró registro para la fecha ${fecha}`
-    });
-  }
-  
-  res.status(200).json({
-    status: 'success',
-    data: venta
-  });
-});
-
-// POST - Crear un nuevo registro
-app.post('/api/ventas', (req, res) => {
-  const nuevoRegistro = req.body;
-  
-  // Validación básica
-  if (!nuevoRegistro.indice_tiempo) {
-    return res.status(400).json({
-      status: 'error',
-      message: 'El campo indice_tiempo es obligatorio'
-    });
-  }
-  
-  // Verificar si ya existe un registro con esa fecha
-  const existeRegistro = ventasData.some(v => v.indice_tiempo === nuevoRegistro.indice_tiempo);
-  if (existeRegistro) {
-    return res.status(400).json({
-      status: 'error',
-      message: `Ya existe un registro para la fecha ${nuevoRegistro.indice_tiempo}`
-    });
-  }
-  
-  ventasData.push(nuevoRegistro);
-  
-  res.status(201).json({
-    status: 'success',
-    message: 'Registro creado correctamente',
-    data: nuevoRegistro
-  });
-});
-
-// PUT - Actualizar un registro existente
-app.put('/api/ventas/:fecha', (req, res) => {
-  const fecha = req.params.fecha;
-  const datosActualizados = req.body;
-  
-  const indice = ventasData.findIndex(v => v.indice_tiempo === fecha);
-  
-  if (indice === -1) {
-    return res.status(404).json({
-      status: 'error',
-      message: `No se encontró registro para la fecha ${fecha}`
-    });
-  }
-  
-  // Mantener la fecha original
-  datosActualizados.indice_tiempo = fecha;
-  
-  // Actualizar el registro
-  ventasData[indice] = { ...ventasData[indice], ...datosActualizados };
-  
-  res.status(200).json({
-    status: 'success',
-    message: 'Registro actualizado correctamente',
-    data: ventasData[indice]
-  });
-});
-
-// DELETE - Eliminar un registro
-app.delete('/api/ventas/:fecha', (req, res) => {
-  const fecha = req.params.fecha;
-  
-  const indiceInicial = ventasData.length;
-  ventasData = ventasData.filter(v => v.indice_tiempo !== fecha);
-  
-  if (ventasData.length === indiceInicial) {
-    return res.status(404).json({
-      status: 'error',
-      message: `No se encontró registro para la fecha ${fecha}`
-    });
-  }
-  
-  res.status(200).json({
-    status: 'success',
-    message: `Registro de fecha ${fecha} eliminado correctamente`
-  });
-});
-
-// FILTROS ADICIONALES
-
-// GET - Filtrar ventas por rango de fechas
-app.get('/api/ventas/filtro/fecha', (req, res) => {
-  const { desde, hasta } = req.query;
-  
-  if (!desde || !hasta) {
-    return res.status(400).json({
-      status: 'error',
-      message: 'Los parámetros desde y hasta son obligatorios'
-    });
-  }
-  
-  const ventasFiltradas = ventasData.filter(v => 
-    v.indice_tiempo >= desde && v.indice_tiempo <= hasta
-  );
-  
-  res.status(200).json({
-    status: 'success',
-    count: ventasFiltradas.length,
-    data: ventasFiltradas
-  });
-});
-
-// GET - Obtener ventas por canal (online vs salón)
-app.get('/api/ventas/filtro/canal', (req, res) => {
-  const { canal } = req.query;
-  
-  if (!canal || (canal !== 'online' && canal !== 'salon')) {
-    return res.status(400).json({
-      status: 'error',
-      message: 'El parámetro canal es obligatorio y debe ser "online" o "salon"'
-    });
-  }
-  
-  const resultado = ventasData.map(v => ({
-    indice_tiempo: v.indice_tiempo,
-    ventas: canal === 'online' ? v.canales_on_line : v.salon_ventas
-  }));
-  
-  res.status(200).json({
-    status: 'success',
-    count: resultado.length,
-    canal: canal,
-    data: resultado
-  });
-});
-
-// GET - Obtener ventas por medio de pago
-app.get('/api/ventas/filtro/medio-pago', (req, res) => {
-  const { medio } = req.query;
-  const mediosValidos = ['efectivo', 'tarjetas_debito', 'tarjetas_credito', 'otros_medios'];
-  
-  if (!medio || !mediosValidos.includes(medio)) {
-    return res.status(400).json({
-      status: 'error',
-      message: `El parámetro medio es obligatorio y debe ser uno de: ${mediosValidos.join(', ')}`
-    });
-  }
-  
-  const resultado = ventasData.map(v => ({
-    indice_tiempo: v.indice_tiempo,
-    ventas: v[medio]
-  }));
-  
-  res.status(200).json({
-    status: 'success',
-    count: resultado.length,
-    medio_pago: medio,
-    data: resultado
-  });
-});
-
-// GET - Obtener ventas por categoría de producto
-app.get('/api/ventas/filtro/categoria', (req, res) => {
-  const { categoria } = req.query;
-  const categoriasValidas = [
-    'bebidas', 'almacen', 'panaderia', 'lacteos', 'carnes', 
-    'verduleria_fruteria', 'alimentos_preparados_rotiseria', 
-    'articulos_limpieza_perfumeria', 'indumentaria_calzado_textiles_hogar', 
-    'electronicos_articulos_hogar', 'otros'
-  ];
-  
-  if (!categoria || !categoriasValidas.includes(categoria)) {
-    return res.status(400).json({
-      status: 'error',
-      message: `El parámetro categoria es obligatorio y debe ser uno de: ${categoriasValidas.join(', ')}`
-    });
-  }
-  
-  const resultado = ventasData.map(v => ({
-    indice_tiempo: v.indice_tiempo,
-    ventas: v[categoria]
-  }));
-  
-  res.status(200).json({
-    status: 'success',
-    count: resultado.length,
-    categoria: categoria,
-    data: resultado
-  });
-});
-
-// GET - Estadísticas generales
-app.get('/api/estadisticas', (req, res) => {
-  if (ventasData.length === 0) {
-    return res.status(404).json({
-      status: 'error',
-      message: 'No hay datos disponibles para calcular estadísticas'
-    });
-  }
-  
-  // Calcular totales por canal
-  const totalOnline = ventasData.reduce((sum, v) => sum + v.canales_on_line, 0);
-  const totalSalon = ventasData.reduce((sum, v) => sum + v.salon_ventas, 0);
-  
-  // Calcular totales por medio de pago
-  const totalEfectivo = ventasData.reduce((sum, v) => sum + v.efectivo, 0);
-  const totalDebito = ventasData.reduce((sum, v) => sum + v.tarjetas_debito, 0);
-  const totalCredito = ventasData.reduce((sum, v) => sum + v.tarjetas_credito, 0);
-  const totalOtrosMedios = ventasData.reduce((sum, v) => sum + v.otros_medios, 0);
-  
-  // Calcular ventas máximas y mínimas
-  const ventasMaximas = Math.max(...ventasData.map(v => v.ventas_precios_corrientes));
-  const ventasMinimas = Math.min(...ventasData.map(v => v.ventas_precios_corrientes));
-  
-  // Fecha con mayores ventas
-  const fechaMayoresVentas = ventasData.find(v => v.ventas_precios_corrientes === ventasMaximas).indice_tiempo;
-  
-  res.status(200).json({
-    status: 'success',
-    data: {
-      total_registros: ventasData.length,
-      canales: {
-        online: totalOnline,
-        salon: totalSalon,
-        porcentaje_online: (totalOnline / (totalOnline + totalSalon) * 100).toFixed(2) + '%'
-      },
-      medios_pago: {
-        efectivo: totalEfectivo,
-        debito: totalDebito,
-        credito: totalCredito,
-        otros: totalOtrosMedios
-      },
-      ventas: {
-        maximas: ventasMaximas,
-        minimas: ventasMinimas,
-        fecha_mayores_ventas: fechaMayoresVentas
+      if (clave === 'indice_tiempo') {
+        // Si la clave es 'indice_tiempo', intenta convertir la fecha de MM/DD/YYYY a YYYY-MM-DD
+        const partes = valor.split('/');
+        if (partes.length === 3) {
+          const [mes, dia, anio] = partes;
+          fila[clave] = `${anio}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}`;
+        } else {
+          fila[clave] = valor; // Si ya está en formato correcto, lo deja igual
+        }
+      } else {
+        const num = parseFloat(valor); // Intenta convertir el valor a número
+        fila[clave] = isNaN(num) ? valor : Math.round(num); // Si no es número, deja el texto; si es número, lo redondea
       }
     }
+
+    datos.push(fila); // Agrega la fila procesada al array de datos
+  })
+  .on('end', () => {
+    console.log('CSV cargado correctamente');
+    if (datos.length > 0) {
+      columnas = Object.keys(datos[0]); // Guarda los nombres de las columnas usando la primera fila
+    }
+  });
+
+// Endpoint 1: Devuelve las ventas de un producto a lo largo del tiempo
+app.get('/producto/:nombre', (req, res) => {
+  const nombre = req.params.nombre; // Obtiene el nombre del producto desde la URL
+  if (!columnas.includes(nombre)) {
+    return res.status(404).json({ error: 'Producto no encontrado' }); // Si el producto no existe, error
+  }
+
+  // Crea un array con la fecha y las ventas para ese producto
+  const resultado = datos.map(row => ({
+    fecha: row.indice_tiempo,
+    ventas: row[nombre]
+  }));
+
+  res.json({ producto: nombre, ventas: resultado }); // Devuelve el resultado como JSON
+});
+
+// Endpoint 2: Devuelve la cantidad de ventas por medio de pago en una fecha específica
+app.get('/ventas/:fecha/:medio_pago', (req, res) => {
+  const { fecha, medio_pago } = req.params;
+
+  if (!columnas.includes(medio_pago)) {
+    return res.status(404).json({ error: 'Medio de pago no encontrado' });
+  }
+
+  const fila = datos.find(row => row.indice_tiempo === fecha); // Busca la fila por fecha
+
+  if (!fila) {
+    return res.status(404).json({ error: 'Fecha no encontrada. Usa formato YYYY-MM-DD' });
+  }
+
+  res.json({
+    fecha: fila.indice_tiempo,
+    medio_pago,
+    cantidad: fila[medio_pago]
   });
 });
 
-// Iniciar el servidor después de cargar los datos
-const iniciarServidor = async () => {
-  try {
-    ventasData = await cargarDatos();
-    console.log(`Datos cargados: ${ventasData.length} registros`);
-    
-    app.listen(PORT, () => {
-      console.log(`Servidor corriendo en http://localhost:${PORT}`);
-    });
-  } catch (error) {
-    console.error('Error al cargar los datos:', error);
+// Endpoint 3: Devuelve la fecha con mayor venta total
+app.get('/mayor-venta', (req, res) => {
+  let maxVenta = 0;
+  let fechaMax = '';
+
+  datos.forEach(row => {
+    // Suma las ventas de todas las columnas (excepto la fecha)
+    const total = columnas.reduce((sum, col) => {
+      return col !== 'indice_tiempo' && typeof row[col] === 'number' ? sum + row[col] : sum;
+    }, 0);
+
+    if (total > maxVenta) {
+      maxVenta = total;
+      fechaMax = row.indice_tiempo;
+    }
+  });
+
+  res.json({ fecha: fechaMax, total_ventas: maxVenta });
+});
+
+// Endpoint 4: Devuelve la fecha con menor venta total
+app.get('/menor-venta', (req, res) => {
+  let minVenta = Infinity;
+  let fechaMin = '';
+
+  datos.forEach(row => {
+    // Suma las ventas de todas las columnas (excepto la fecha)
+    const total = columnas.reduce((sum, col) => {
+      return col !== 'indice_tiempo' && typeof row[col] === 'number' ? sum + row[col] : sum;
+    }, 0);
+
+    if (total < minVenta) {
+      minVenta = total;
+      fechaMin = row.indice_tiempo;
+    }
+  });
+
+  res.json({ fecha: fechaMin, total_ventas: minVenta });
+});
+
+// Endpoint 5: Agrega una nueva fila al CSV
+app.post('/crear', (req, res) => {
+  const nuevaFila = req.body; // Lee la nueva fila desde el cuerpo del request
+
+  // Verifica que venga el campo de fecha
+  if (!nuevaFila.indice_tiempo) {
+    return res.status(400).json({ error: 'Falta el campo "indice_tiempo"' });
   }
-};
 
-iniciarServidor();
+  // Verifica que no exista ya una fila con esa misma fecha
+  if (datos.some(row => row.indice_tiempo === nuevaFila.indice_tiempo)) {
+    return res.status(409).json({ error: 'Ya existe una fila con esa fecha' });
+  }
 
-export default app;
+  // Completa la fila con 0 para las columnas que falten
+  const filaCompleta = {}; // Crea un objeto vacío que representará la nueva fila completa
+
+  for (const col of columnas) { // Recorre todas las columnas esperadas
+    filaCompleta[col] = col === 'indice_tiempo' // Si la columna es 'indice_tiempo' (la fecha)
+      ? nuevaFila[col] // Usa el valor enviado para la fecha
+      : typeof nuevaFila[col] === 'number' ? nuevaFila[col] : 0; // Usa el valor si es número, si no, pone 0
+  } 
+
+  datos.push(filaCompleta); // Agrega la nueva fila a los datos en memoria
+
+  // Prepara la fila en formato CSV para guardar en el archivo
+  const filaCSV = columnas.map(col => filaCompleta[col]).join(',');
+
+  // Agrega la nueva fila al final del archivo CSV
+  fs.appendFile('./data/VentasProductosSupermercados.csv', `\n${filaCSV}`, err => {
+    if (err) console.error('Error al guardar en CSV:', err);
+  });
+
+  // Responde con éxito
+  res.status(201).json({ mensaje: 'Fila agregada correctamente', fila: filaCompleta });
+});
+
+
+// Endpoint 6: Elimina una fila por fecha
+app.delete('/eliminar/:fecha', (req, res) => {
+  const fecha = req.params.fecha;
+  const index = datos.findIndex(row => row.indice_tiempo === fecha); // Busca la fila por fecha
+
+  if (index === -1) {
+    return res.status(404).json({ error: 'Fecha no encontrada. Usá el formato YYYY-MM-DD' });
+  }
+
+  const eliminada = datos.splice(index, 1)[0]; // Elimina la fila del array
+  res.json({ mensaje: 'Fila eliminada correctamente', fila: eliminada });
+});
+
+// Inicia el servidor en el puerto indicado
+app.listen(PORT, () => {
+  console.log(`Servidor corriendo en http://localhost:${PORT}`);
+});
