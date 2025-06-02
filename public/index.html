@@ -1,4 +1,3 @@
-<!--
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -9,113 +8,98 @@
 </head>
 <body>
     <header>
-        <h1>API de Ventas de Supermercados</h1>
-        <p>Sistema de gestión de datos de ventas de supermercados</p>
+        <h1>Consumir API de Ventas de Supermercados</h1>
+        <p>Prueba los endpoints de tu API.</p>
     </header>
 
     <main>
-        <section class="endpoints">
-            <h2>Endpoints Disponibles</h2>
-            
-            <div class="endpoint-card">
-                <h3>Endpoints Básicos</h3>
-                <ul>
-                    <li><strong>GET /api/ventas</strong> - Obtener todos los registros</li>
-                    <li><strong>GET /api/ventas/:fecha</strong> - Obtener registro por fecha</li>
-                    <li><strong>POST /api/ventas</strong> - Crear nuevo registro</li>
-                    <li><strong>PUT /api/ventas/:fecha</strong> - Actualizar registro existente</li>
-                    <li><strong>DELETE /api/ventas/:fecha</strong> - Eliminar registro</li>
-                </ul>
-            </div>
+        <section class="api-consumer">
+            <h2>Prueba de Endpoints</h2>
 
-            <div class="endpoint-card">
-                <h3>Filtros y Funcionalidades Adicionales</h3>
-                <ul>
-                    <li><strong>GET /api/ventas/filtro/fecha?desde=YYYY-MM-DD&hasta=YYYY-MM-DD</strong> - Filtrar por rango de fechas</li>
-                    <li><strong>GET /api/ventas/filtro/canal?canal=online|salon</strong> - Filtrar por canal de venta</li>
-                    <li><strong>GET /api/ventas/filtro/medio-pago?medio=efectivo|tarjetas_debito|tarjetas_credito|otros_medios</strong> - Filtrar por medio de pago</li>
-                    <li><strong>GET /api/ventas/filtro/categoria?categoria=bebidas|almacen|...</strong> - Filtrar por categoría de producto</li>
-                    <li><strong>GET /api/estadisticas</strong> - Obtener estadísticas generales</li>
-                </ul>
-            </div>
-        </section>
-
-        <section class="test-api">
-            <h2>Probar la API</h2>
-            
             <div class="form-container">
-                <h3>Consultar Datos</h3>
-                <form id="queryForm">
+                <form id="apiQueryForm">
                     <div class="form-group">
-                        <label for="endpoint">Endpoint:</label>
-                        <select id="endpoint" required>
-                            <option value="/api/ventas">Todos los registros</option>
-                            <option value="/api/estadisticas">Estadísticas generales</option>
-                            <option value="/api/ventas/filtro/fecha">Filtrar por fecha</option>
-                            <option value="/api/ventas/filtro/canal">Filtrar por canal</option>
-                            <option value="/api/ventas/filtro/medio-pago">Filtrar por medio de pago</option>
-                            <option value="/api/ventas/filtro/categoria">Filtrar por categoría</option>
+                        <label for="endpoint">Selecciona un Endpoint:</label>
+                        <select id="endpoint">
+                            <option value="/api/ventas">GET /api/ventas (Obtener todo)</option>
+                            <option value="/api/ventas/:fecha">GET /api/ventas/:fecha (Obtener por fecha)</option>
+                            <option value="/api/ventas/filtro/fecha">GET /api/ventas/filtro/fecha (Rango de fechas)</option>
+                            <option value="/api/ventas/filtro/canal">GET /api/ventas/filtro/canal (Por canal)</option>
+                            <option value="/api/ventas/filtro/medio-pago">GET /api/ventas/filtro/medio-pago (Por medio de pago)</option>
+                            <option value="/api/ventas/filtro/categoria">GET /api/ventas/filtro/categoria (Por categoría)</option>
+                            <option value="POST /api/ventas">POST /api/ventas (Crear)</option>
+                            <option value="PUT /api/ventas/:fecha">PUT /api/ventas/:fecha (Actualizar)</option>
+                            <option value="DELETE /api/ventas/:fecha">DELETE /api/ventas/:fecha (Eliminar)</option>
                         </select>
                     </div>
-                    
-                    <div id="dateParams" class="form-group hidden">
-                        <label for="desde">Desde:</label>
-                        <input type="date" id="desde">
-                        <label for="hasta">Hasta:</label>
-                        <input type="date" id="hasta">
+
+                    <div id="getFechaParams" class="hidden form-group">
+                        <label for="getFecha">Fecha (YYYY-MM-DD):</label>
+                        <input type="text" id="getFecha" placeholder="Ej: 2023-01-01">
                     </div>
-                    
-                    <div id="canalParams" class="form-group hidden">
+
+                    <div id="rangoFechaParams" class="hidden form-group">
+                        <label for="fechaDesde">Desde (YYYY-MM-DD):</label>
+                        <input type="text" id="fechaDesde" placeholder="Ej: 2023-01-01">
+                        <label for="fechaHasta">Hasta (YYYY-MM-DD):</label>
+                        <input type="text" id="fechaHasta" placeholder="Ej: 2023-01-31">
+                    </div>
+
+                    <div id="canalParams" class="hidden form-group">
                         <label for="canal">Canal:</label>
-                        <select id="canal">
-                            <option value="online">Online</option>
-                            <option value="salon">Salón de ventas</option>
-                        </select>
+                        <input type="text" id="canal" placeholder="Ej: Online">
                     </div>
-                    
-                    <div id="medioParams" class="form-group hidden">
-                        <label for="medio">Medio de pago:</label>
-                        <select id="medio">
-                            <option value="efectivo">Efectivo</option>
-                            <option value="tarjetas_debito">Tarjeta de débito</option>
-                            <option value="tarjetas_credito">Tarjeta de crédito</option>
-                            <option value="otros_medios">Otros medios</option>
-                        </select>
+
+                    <div id="medioPagoParams" class="hidden form-group">
+                        <label for="medioPago">Medio de Pago:</label>
+                        <input type="text" id="medioPago" placeholder="Ej: Tarjeta de Credito">
                     </div>
-                    
-                    <div id="categoriaParams" class="form-group hidden">
+
+                    <div id="categoriaParams" class="hidden form-group">
                         <label for="categoria">Categoría:</label>
-                        <select id="categoria">
-                            <option value="bebidas">Bebidas</option>
-                            <option value="almacen">Almacén</option>
-                            <option value="panaderia">Panadería</option>
-                            <option value="lacteos">Lácteos</option>
-                            <option value="carnes">Carnes</option>
-                            <option value="verduleria_fruteria">Verdulería y frutería</option>
-                            <option value="alimentos_preparados_rotiseria">Alimentos preparados</option>
-                            <option value="articulos_limpieza_perfumeria">Limpieza y perfumería</option>
-                            <option value="indumentaria_calzado_textiles_hogar">Indumentaria y textiles</option>
-                            <option value="electronicos_articulos_hogar">Electrónicos</option>
-                            <option value="otros">Otros</option>
-                        </select>
+                        <input type="text" id="categoria" placeholder="Ej: Lacteos">
                     </div>
-                    
-                    <button type="submit">Consultar</button>
+
+                    <div id="dataEntryParams" class="hidden form-group">
+                        <h3>Datos del Registro:</h3>
+                        <label for="postPutIndiceTiempo">Indice Tiempo (YYYY-MM-DD):</label>
+                        <input type="text" id="postPutIndiceTiempo" placeholder="Ej: 2023-01-01">
+                        <label for="postPutCanal">Canal:</label>
+                        <input type="text" id="postPutCanal" placeholder="Ej: Tienda Física">
+                        <label for="postPutMedioPago">Medio de Pago:</label>
+                        <input type="text" id="postPutMedioPago" placeholder="Ej: Efectivo">
+                        <label for="postPutCategoria">Categoría:</label>
+                        <input type="text" id="postPutCategoria" placeholder="Ej: Frutas">
+                        <label for="postPutProducto">Producto:</label>
+                        <input type="text" id="postPutProducto" placeholder="Ej: Manzanas">
+                        <label for="postPutTotalVentas">Total Ventas:</label>
+                        <input type="number" id="postPutTotalVentas" placeholder="Ej: 1500">
+                        <label for="postPutUnidadesVendidas">Unidades Vendidas:</label>
+                        <input type="number" id="postPutUnidadesVendidas" placeholder="Ej: 10">
+                        <label for="postPutMargenGanancia">Margen Ganancia:</label>
+                        <input type="number" id="postPutMargenGanancia" placeholder="Ej: 300">
+                    </div>
+
+                    <div id="deleteFechaParams" class="hidden form-group">
+                        <label for="deleteFecha">Fecha a Eliminar (YYYY-MM-DD):</label>
+                        <input type="text" id="deleteFecha" placeholder="Ej: 2023-01-01">
+                    </div>
+
+                    <button type="submit">Enviar Solicitud</button>
                 </form>
             </div>
-            
+
             <div class="result-container">
-                <h3>Resultado</h3>
-                <pre id="result">Los resultados se mostrarán aquí...</pre>
+                <h3>Respuesta de la API</h3>
+                <pre id="apiResult">Aquí se mostrará la respuesta de la API...</pre>
             </div>
         </section>
     </main>
 
     <footer>
-        <p>API de Ventas de Supermercados - Aplicación NodeJS con Express</p>
+        <p>API de Ventas de Supermercados - NodeJS con Express y SQLite</p>
     </footer>
 
     <script src="script.js"></script>
 </body>
 </html>
--->
