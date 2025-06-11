@@ -1,14 +1,11 @@
-describe('Obtener ventas por fecha', () => {
-  it('Debería seleccionar el endpoint y buscar por fecha', () => {
+describe('Obtener Ventas por Fecha', () => {
+  it('Debería seleccionar la opción de buscar por fecha y obtener los resultados', () => {
     cy.visit('http://localhost:7050/');
 
-    // Seleccionar el endpoint GET
-    cy.get('#endpoint').select('GET /api/ventas/:fecha (Obtener por fecha)');
+    cy.get('#endpoint').select('GET_BY_DATE');
 
-    // Ingresar la fecha
-    cy.get('#getFecha').click().type('2026-01-01');
+    cy.get('#getFecha').type('2025-07-15');
 
-    // Enviar
-    cy.xpath("//button[@type='submit']").click();
+    cy.get('#apiQueryForm').submit();
   });
 });

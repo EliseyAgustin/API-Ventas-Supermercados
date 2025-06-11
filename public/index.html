@@ -19,70 +19,49 @@
             <div class="form-container">
                 <form id="apiQueryForm">
                     <div class="form-group">
-                        <label for="endpoint">Selecciona un Endpoint:</label>
+                        <label for="endpoint">Selecciona una Acción:</label>
                         <select id="endpoint">
-                            <option value="/api/ventas">GET /api/ventas (Obtener todo)</option>
-                            <option value="/api/ventas/:fecha">GET /api/ventas/:fecha (Obtener por fecha)</option>
-                            <option value="/api/ventas/filtro/fecha">GET /api/ventas/filtro/fecha (Rango de fechas)</option>
-                            <option value="/api/ventas/filtro/canal">GET /api/ventas/filtro/canal (Por canal)</option>
-                            <option value="/api/ventas/filtro/medio-pago">GET /api/ventas/filtro/medio-pago (Por medio de pago)</option>
-                            <option value="/api/ventas/filtro/categoria">GET /api/ventas/filtro/categoria (Por categoría)</option>
-                            <option value="POST /api/ventas">POST /api/ventas (Crear)</option>
-                            <option value="PUT /api/ventas/:fecha">PUT /api/ventas/:fecha (Actualizar)</option>
-                            <option value="DELETE /api/ventas/:fecha">DELETE /api/ventas/:fecha (Eliminar)</option>
+                            <option value="">-- Elige una opción --</option>
+                            <option value="GET_ALL">GET /api/ventas (Obtener todo)</option>
+                            <option value="GET_BY_DATE">GET /api/ventas/fecha/:fecha</option>
+                            <option value="GET_BY_RANGE">GET /api/ventas/rango_fecha</option>
+                            <option value="POST">POST /api/ventas (Agregar Venta)</option>
+                            <option value="PUT">PUT /api/ventas/:id (Actualizar Venta)</option>
+                            <option value="DELETE">DELETE /api/ventas/:id (Eliminar Venta)</option>
                         </select>
                     </div>
 
                     <div id="getFechaParams" class="hidden form-group">
-                        <label for="getFecha">Fecha (YYYY-MM-DD):</label>
-                        <input type="text" id="getFecha" placeholder="Ej: 2023-01-01">
+                        <label for="getFecha">Fecha (AAAA-MM-DD):</label>
+                        <input type="text" id="getFecha" class="param-input" placeholder="Ej: 2024-01-15">
                     </div>
 
                     <div id="rangoFechaParams" class="hidden form-group">
-                        <label for="fechaDesde">Desde (YYYY-MM-DD):</label>
-                        <input type="text" id="fechaDesde" placeholder="Ej: 2023-01-01">
-                        <label for="fechaHasta">Hasta (YYYY-MM-DD):</label>
-                        <input type="text" id="fechaHasta" placeholder="Ej: 2023-01-31">
+                        <label for="fechaDesde">Desde (AAAA-MM-DD):</label>
+                        <input type="text" id="fechaDesde" class="param-input" placeholder="Ej: 2024-01-01">
+                        <label for="fechaHasta">Hasta (AAAA-MM-DD):</label>
+                        <input type="text" id="fechaHasta" class="param-input" placeholder="Ej: 2024-01-31">
+                    </div>
+                    
+                    <div id="addVentaParams" class="hidden form-group">
+                        <label for="addFecha">Fecha (AAAA-MM-DD):</label>
+                        <input type="text" id="addFecha" class="param-input" placeholder="Ej: 2024-06-11">
+                        <label for="addAlimento">Producto:</label>
+                        <select id="addAlimento" class="param-input"></select>
+                        <label for="addCantidad">Cantidad:</label>
+                        <input type="number" id="addCantidad" placeholder="Ej: 50" class="param-input">
                     </div>
 
-                    <div id="canalParams" class="hidden form-group">
-                        <label for="canal">Canal:</label>
-                        <input type="text" id="canal" placeholder="Ej: Online">
+                    <div id="updateVentaParams" class="hidden form-group">
+                        <label for="updateId">ID de la Venta:</label>
+                        <input type="number" id="updateId" placeholder="Ej: 1" class="param-input">
+                        <label for="updateCantidad">Nueva Cantidad:</label>
+                        <input type="number" id="updateCantidad" placeholder="Ej: 75" class="param-input">
                     </div>
 
-                    <div id="medioPagoParams" class="hidden form-group">
-                        <label for="medioPago">Medio de Pago:</label>
-                        <input type="text" id="medioPago" placeholder="Ej: Tarjeta de Credito">
-                    </div>
-
-                    <div id="categoriaParams" class="hidden form-group">
-                        <label for="categoria">Categoría:</label>
-                        <input type="text" id="categoria" placeholder="Ej: Lacteos">
-                    </div>
-
-                    <div id="dataEntryParams" class="hidden form-group">
-                        <h3>Datos del Registro:</h3>
-                        <label for="postPutIndiceTiempo">Indice Tiempo (YYYY-MM-DD):</label>
-                        <input type="text" id="postPutIndiceTiempo" placeholder="Ej: 2023-01-01">
-                        <label for="postPutCanal">Canal:</label>
-                        <input type="text" id="postPutCanal" placeholder="Ej: Tienda Física">
-                        <label for="postPutMedioPago">Medio de Pago:</label>
-                        <input type="text" id="postPutMedioPago" placeholder="Ej: Efectivo">
-                        <label for="postPutCategoria">Categoría:</label>
-                        <input type="text" id="postPutCategoria" placeholder="Ej: Frutas">
-                        <label for="postPutProducto">Producto:</label>
-                        <input type="text" id="postPutProducto" placeholder="Ej: Manzanas">
-                        <label for="postPutTotalVentas">Total Ventas:</label>
-                        <input type="number" id="postPutTotalVentas" placeholder="Ej: 1500">
-                        <label for="postPutUnidadesVendidas">Unidades Vendidas:</label>
-                        <input type="number" id="postPutUnidadesVendidas" placeholder="Ej: 10">
-                        <label for="postPutMargenGanancia">Margen Ganancia:</label>
-                        <input type="number" id="postPutMargenGanancia" placeholder="Ej: 300">
-                    </div>
-
-                    <div id="deleteFechaParams" class="hidden form-group">
-                        <label for="deleteFecha">Fecha a Eliminar (YYYY-MM-DD):</label>
-                        <input type="text" id="deleteFecha" placeholder="Ej: 2023-01-01">
+                    <div id="deleteVentaParams" class="hidden form-group">
+                        <label for="deleteId">ID de la Venta a Eliminar:</label>
+                        <input type="number" id="deleteId" placeholder="Ej: 1" class="param-input">
                     </div>
 
                     <button type="submit">Enviar Solicitud</button>
@@ -99,7 +78,6 @@
     <footer>
         <p>API de Ventas de Supermercados - NodeJS con Express y SQLite</p>
     </footer>
-
     <script src="script.js"></script>
 </body>
 </html>

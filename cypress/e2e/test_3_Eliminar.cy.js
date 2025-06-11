@@ -1,14 +1,23 @@
-describe('Eliminar ventas por fecha', () => {
-  it('Debería seleccionar el endpoint y eliminar las ventas de una fecha', () => {
+describe('Eliminar una Venta por ID', () => {
+  let ventaIdParaEliminar;
+
+  before(() => {
+    cy.request('POST', 'http://localhost:7050/api/ventas', {
+      fecha: '2025-12-31',
+      id_alimento: 5,
+      cantidad: 99
+    }).then(response => {
+      ventaIdParaEliminar = response.body.id_venta;
+    });
+  });
+
+  it('Debería seleccionar la opción de eliminar, ingresar el ID y eliminar la venta', () => {
     cy.visit('http://localhost:7050/');
 
-    // Selección del endpoint DELETE
-    cy.get('#endpoint').select('DELETE /api/ventas/:fecha (Eliminar)');
+    cy.get('#endpoint').select('DELETE');
 
-    // Ingresar fecha
-    cy.get('#deleteFecha').click().type('2026-01-01');
+    cy.get('#deleteId').type(ventaIdParaEliminar);
 
-    // Enviar
-    cy.xpath("//button[@type='submit']").click();
+    cy.get('#apiQueryForm').submit();
   });
 });
