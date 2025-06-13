@@ -4,7 +4,7 @@ describe('Obtener Ventas por Fecha', () => {
 
     cy.get('#endpoint').select('GET_BY_DATE');
 
-    cy.get('#getFecha').type('2025-07-15');
+    cy.get('#getFecha').type('2028-02-03');
 
     cy.get('#apiQueryForm').submit();
   });

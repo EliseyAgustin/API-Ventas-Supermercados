@@ -115,7 +115,6 @@ app.get('/api/ventas/rango_fecha', (req, res) => {
   });
 });
 
-
 // POST: Agregar una nueva venta
 app.post('/api/ventas', (req, res) => {
   const { fecha, id_alimento, cantidad } = req.body;

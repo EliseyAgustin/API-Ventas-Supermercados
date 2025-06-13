@@ -4,9 +4,9 @@ describe('Creación de una Venta', () => {
 
     cy.get('#endpoint').select('POST');
 
-    cy.get('#addFecha').type('2025-07-15');
+    cy.get('#addFecha').type('2028-02-03');
     
-    cy.get('#addAlimento').select('Carnes'); 
+    cy.get('#addAlimento').select('Limpieza'); 
 
     cy.get('#addCantidad').type('150');
 

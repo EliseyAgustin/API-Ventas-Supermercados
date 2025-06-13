@@ -1,23 +1,21 @@
-describe('Eliminar una Venta por ID', () => {
-  let ventaIdParaEliminar;
+describe('Eliminar una Venta dinámicamente por ID', () => {
+  const fechaDePrueba = '2028-02-03';
 
-  before(() => {
-    cy.request('POST', 'http://localhost:7050/api/ventas', {
-      fecha: '2025-12-31',
-      id_alimento: 5,
-      cantidad: 99
-    }).then(response => {
-      ventaIdParaEliminar = response.body.id_venta;
-    });
-  });
+  it('Debería buscar el ID de una venta por su fecha y luego usarlo para eliminarla', () => {
+    cy.request('GET', `http://localhost:7050/api/ventas/fecha/${fechaDePrueba}`)
+      .then(response => {
 
-  it('Debería seleccionar la opción de eliminar, ingresar el ID y eliminar la venta', () => {
-    cy.visit('http://localhost:7050/');
+        const idParaEliminar = response.body.data[0].id_venta;
 
-    cy.get('#endpoint').select('DELETE');
+        cy.log(`Venta encontrada con ID: ${idParaEliminar}. Procediendo a eliminar.`);
 
-    cy.get('#deleteId').type(ventaIdParaEliminar);
+        cy.visit('http://localhost:7050/');
 
-    cy.get('#apiQueryForm').submit();
+        cy.get('#endpoint').select('DELETE');
+
+        cy.get('#deleteId').type(idParaEliminar);
+
+        cy.get('#apiQueryForm').submit();
+      });
   });
 });
