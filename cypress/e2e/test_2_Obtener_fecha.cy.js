@@ -1,5 +1,5 @@
 describe('Obtener Ventas por Fecha', () => {
-  it('Debería seleccionar la opción de buscar por fecha y obtener los resultados', () => {
+  it('Buscar por fecha y obtener los resultados', () => {
     cy.visit('http://localhost:7050/');
 
     cy.get('#endpoint').select('GET_BY_DATE');
